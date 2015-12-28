@@ -1,0 +1,14 @@
+{% load staticfiles %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'tagger/style.css' %}" />
+
+{% if latest_tweet_list %}
+    <ul>
+    {% for tweet in latest_tweet_list %}
+
+        <li><a>{{ tweet }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No Tweets are available.</p>
+{% endif %}

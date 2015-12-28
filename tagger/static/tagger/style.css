@@ -1,0 +1,15 @@
+li a {
+    color: green;
+}
+
+body {
+    background: white url("images/background.gif") no-repeat right bottom;
+}
+
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 15px;
+}
