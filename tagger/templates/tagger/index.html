@@ -6,7 +6,7 @@
     <ul>
     {% for tweet in latest_tweet_list %}
 
-        <li><a href="{% url 'tagger:submit' tweet.id%}">{{ tweet.text }}</a></li>
+        <li><a href="{% url 'tagger:sentiment' tweet.id%}">{{ tweet.text }}</a></li>
     {% endfor %}
     </ul>
     {% if is_paginated %}
@@ -27,3 +27,4 @@
 {% else %}
     <p>No Tweets are available.</p>
 {% endif %}
+Tweets Pending: {{ tweets_pending }}

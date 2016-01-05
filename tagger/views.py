@@ -28,41 +28,39 @@ class IndexView(generic.ListView):
         else:
             pFrom = 0
 
-        docs = engine.search_all('gensory', 'tweets', self.paginate_by, pFrom)
+        hits = engine.search_all('gensory', 'tweets', self.paginate_by, pFrom)
+
+        docs = hits[u'hits']
+        total = hits[u'total']
+
         tweets = converter.tweets(docs)
-        #paginator = Paginator(tweets, self.paginate_by)
 
-        '''try:
-            file_exams = paginator.page(page)
-        except PageNotAnInteger:
-            file_exams = paginator.page(1)
-        except EmptyPage:
-            file_exams = paginator.page(paginator.num_pages)'''
-
-        context['latest_tweet_list'] = tweets#[{u'text':u'holaaaaaaaaa'}]#Tweet.objects.all()
+        context['latest_tweet_list'] = tweets
+        context['tweets_pending'] = total
         return context
 
 class SentimentView(generic.DetailView):
     model = Tweet
     template_name = 'tagger/sentiment.html'
+    context_object_name = 'tweet_sentiment'
 
-def submit(request, tweet_id):
-    tweet = engine.get('gensory', 'tweets', tweet_id)
-    text = tweet[u'_source'][u'text']
-    '''
-    try:
-        selected_sentiment = tweet.choice_set.get(pk=request.POST['sentiment'])
-    except (KeyError, Sentiment.DoesNotExist):
-        # Redisplay the question voting form.
-        return render(request, 'tagger/detail.html', {
-            'question': tweet,
-            'error_message': "You didn't select a choice.",
-        })
-    else:
-        #selected_choice.votes += 1
-        #selected_choice.save()
-    '''
-    # Always return an HttpResponseRedirect after successfully dealing
-    # with POST data. This prevents data from being posted twice if a
-    # user hits the Back button.
-    return HttpResponseRedirect(reverse('tagger:sentiment', args=(tweet,)))
+    def get_object(self):
+        tweet_id = self.kwargs['tweet_id']
+        doc = engine.get('gensory', 'tweets', tweet_id)
+        text = doc[u'_source'][u'text']
+        tweet = {
+            'id': tweet_id,
+            'text': text
+        }
+        return tweet
+
+    def get_context_data(self, **kwargs):
+        context = super(SentimentView, self).get_context_data(**kwargs)
+        context['tweet_sentiment'] = kwargs['object']
+        return context
+
+def save(request, tweet_id):
+    polarity = float(request.POST[u'polarity'])
+    subjectivity = float(request.POST[u'subjectivity'])
+    engine.update_sentiment('gensory', 'tweets', tweet_id, subjectivity, polarity)
+    return HttpResponseRedirect(reverse('tagger:index'))
