@@ -1,7 +1,7 @@
 {% load staticfiles %}
 
 <link rel="stylesheet" type="text/css" href="{% static 'tagger/style.css' %}" />
-
+  {% csrf_token %}
 {% if latest_tweet_list %}
     <ul>
     {% for tweet in latest_tweet_list %}

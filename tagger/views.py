@@ -1,11 +1,10 @@
 from django.http import HttpResponseRedirect
-from .models import Tweet, Sentiment
-from django.shortcuts import get_object_or_404, render
+from .models import Tweet
 from django.core.urlresolvers import reverse
 from django.views import generic
-from django.core.paginator import Paginator
 import engine
 import converter
+from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 PAGE_SIZE = 25
@@ -59,6 +58,7 @@ class SentimentView(generic.DetailView):
         context['tweet_sentiment'] = kwargs['object']
         return context
 
+@csrf_exempt
 def save(request, tweet_id):
     polarity = float(request.POST[u'polarity'])
     subjectivity = float(request.POST[u'subjectivity'])
